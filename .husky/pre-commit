@@ -1,0 +1,2 @@
+pnpm tsc
+pnpm lint-staged
