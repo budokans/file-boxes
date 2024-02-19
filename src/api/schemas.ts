@@ -8,3 +8,9 @@ export const createFileBoxFormData = z.object({
   file: z.instanceof(File)
 });
 export type CreateFileBoxFormData = z.infer<typeof createFileBoxFormData>;
+
+export interface FileBox {
+  readonly title: string;
+  readonly description: string;
+  readonly storageFilename?: string;
+}

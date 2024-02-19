@@ -4,61 +4,53 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { FileBox } from "@/components/FileBox";
 import { CreateNew } from "@/components/CreateNew";
+import { getAllFileBoxes } from "@/api/read";
 
-const Home = (): ReactElement => (
-  <>
-    <header>
-      <Typography variant="h2" component="h1" textAlign="center">
-        File Boxes
-      </Typography>
-    </header>
+const Home = async (): Promise<ReactElement> => {
+  const fileBoxesOrError = await getAllFileBoxes();
 
-    <Divider flexItem />
-
-    <Stack component="main" rowGap="1.5rem">
+  return (
+    <>
       <header>
-        <Stack direction="row">
-          <Typography variant="h4" component="h2">
-            My Boxes
-          </Typography>
-
-          <CreateNew />
-        </Stack>
+        <Typography variant="h2" component="h1" textAlign="center">
+          File Boxes
+        </Typography>
       </header>
 
-      <Stack direction="row" gap="1rem" flexWrap="wrap">
-        {/* TODO: Replace with fetched data */}
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
-        <FileBox
-          title="Test title est titl est titl est titl"
-          description="Test description Test description Test description Test description"
-        />
+      <Divider flexItem />
+
+      <Stack component="main" rowGap="1.5rem">
+        <header>
+          <Stack direction="row">
+            <Typography variant="h4" component="h2">
+              My Boxes
+            </Typography>
+
+            <CreateNew />
+          </Stack>
+        </header>
+
+        <Stack direction="row" gap="1rem" flexWrap="wrap">
+          {fileBoxesOrError instanceof Error ? (
+            <Typography variant="body1" color="error">
+              {fileBoxesOrError.message}
+            </Typography>
+          ) : (
+            fileBoxesOrError.map((fileBox, idx) => (
+              <FileBox
+                title={fileBox.title}
+                description={fileBox.description}
+                {...(fileBox.storageFilename
+                  ? { filename: fileBox.storageFilename }
+                  : {})}
+                key={idx}
+              />
+            ))
+          )}
+        </Stack>
       </Stack>
-    </Stack>
-  </>
-);
+    </>
+  );
+};
 
 export default Home;

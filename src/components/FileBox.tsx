@@ -15,6 +15,7 @@ interface FileBoxProps {
   readonly description: string;
   readonly filename?: string;
 }
+
 export const FileBox = ({
   title,
   description,
@@ -50,7 +51,7 @@ export const FileBox = ({
       <Stack rowGap="1rem">
         <Typography variant="body1">{description}</Typography>
 
-        <Typography variant="body1">
+        <Typography variant="body1" sx={{ wordWrap: "anywhere" }}>
           {filename ?? "This box is empty."}
         </Typography>
       </Stack>
