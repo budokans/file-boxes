@@ -23,9 +23,13 @@ export const createFileBox = async (
       createFileBoxFormData
     );
 
-    const filename = bucketFilename(parsedData.file.name);
-    await uploadToS3(parsedData.file, filename);
-    await dbCreateFileBox(parsedData, filename);
+    if (parsedData.file && parsedData.file.size > 0) {
+      const filename = bucketFilename(parsedData.file.name);
+      await uploadToS3(parsedData.file, filename);
+      await dbCreateFileBox(parsedData, filename);
+    } else {
+      await dbCreateFileBox(parsedData);
+    }
 
     revalidatePath("/");
 
@@ -46,7 +50,7 @@ export const createFileBox = async (
 
 const dbCreateFileBox = async (
   createData: CreateFileBoxFormData,
-  bucketFilename: string
+  bucketFilename?: string
 ): Promise<void> => {
   const collection = await fileBoxesCollection();
 
@@ -54,7 +58,7 @@ const dbCreateFileBox = async (
     _id: randomUUID(),
     title: createData.description,
     description: createData.description,
-    storage_file_name: bucketFilename,
+    storage_file_name: bucketFilename ?? null,
     created_at: new Date().toISOString(),
     updated_at: null,
     deleted_at: null

@@ -5,7 +5,7 @@ const readonlyNonEmptyString = z.string().min(1).readonly();
 export const createFileBoxFormData = z.object({
   title: readonlyNonEmptyString,
   description: readonlyNonEmptyString,
-  file: z.instanceof(File)
+  file: z.instanceof(File).optional()
 });
 export type CreateFileBoxFormData = z.infer<typeof createFileBoxFormData>;
 
