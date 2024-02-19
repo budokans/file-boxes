@@ -1,6 +1,7 @@
 "use server";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { fileBoxesCollection } from "@/db/mongoDb";
 import { s3 } from "@/db/s3";
@@ -25,6 +26,8 @@ export const createFileBox = async (
     const filename = bucketFilename(parsedData.file.name);
     await uploadToS3(parsedData.file, filename);
     await dbCreateFileBox(parsedData, filename);
+
+    revalidatePath("/");
 
     return {
       success: true,
