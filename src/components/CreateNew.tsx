@@ -4,7 +4,9 @@ import {
   useState,
   type ReactElement,
   type Dispatch,
-  type SetStateAction
+  type SetStateAction,
+  type ReactNode,
+  useEffect
 } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Button from "@mui/material/Button";
@@ -32,103 +34,120 @@ export const CreateNew = (): ReactElement => {
         Create new
       </Button>
 
-      <CreateFormModal isOpen={modalIsOpen} setIsOpen={setModalIsOpen} />
+      <FormModal isOpen={modalIsOpen} setIsOpen={setModalIsOpen}>
+        {modalIsOpen && <CreateNewForm setIsOpen={setModalIsOpen} />}
+      </FormModal>
     </>
   );
 };
 
-interface CreateFormModalProps {
+interface FormModalProps {
   readonly isOpen: boolean;
+  readonly setIsOpen: Dispatch<SetStateAction<boolean>>;
+  readonly children: ReactNode;
+}
+
+export const FormModal = ({
+  isOpen,
+  setIsOpen,
+  children
+}: FormModalProps): ReactElement => (
+  <Modal
+    open={isOpen}
+    onClose={() => setIsOpen(false)}
+    aria-labelledby="edit-modal-title"
+  >
+    <Stack
+      position="absolute"
+      rowGap="1.5rem"
+      top="50%"
+      left="50%"
+      width="24rem"
+      bgcolor="white"
+      border="2px solid black"
+      boxShadow={24}
+      padding="1rem"
+      sx={{ transform: "translate(-50%, -50%)" }}
+    >
+      {children}
+    </Stack>
+  </Modal>
+);
+
+interface CreateNewFormProps {
   readonly setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export const CreateFormModal = ({
-  isOpen,
-  setIsOpen
-}: CreateFormModalProps): ReactElement => {
+const CreateNewForm = ({ setIsOpen }: CreateNewFormProps): ReactElement => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, formAction] = useFormState(createFileBox, {
+  const [state, formAction] = useFormState(createFileBox, {
     message: "",
     success: false
   });
 
+  useEffect(() => {
+    state.success && setIsOpen(false);
+  }, [state, setIsOpen]);
+
   return (
-    <Modal
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-      aria-labelledby="create-modal-title"
-    >
+    <>
+      <Typography id="create-modal-title" variant="h6" component="h2">
+        Create a new File Box
+      </Typography>
       <Stack
-        position="absolute"
         rowGap="1.5rem"
-        top="50%"
-        left="50%"
-        width="24rem"
-        bgcolor="white"
-        border="2px solid black"
-        boxShadow={24}
-        padding="1rem"
-        sx={{ transform: "translate(-50%, -50%)" }}
+        component="form"
+        noValidate
+        autoComplete="off"
+        action={formAction}
       >
-        <Typography id="create-modal-title" variant="h6" component="h2">
-          Create a new File Box
-        </Typography>
+        <TextField
+          required
+          id="title"
+          name="title"
+          label="Title"
+          defaultValue=""
+          placeholder="My File Box..."
+        />
+        <TextField
+          required
+          id="description"
+          name="description"
+          label="Description"
+          defaultValue=""
+          placeholder="File box containing..."
+        />
 
-        <Stack
-          rowGap="1.5rem"
-          component="form"
-          noValidate
-          autoComplete="off"
-          action={formAction}
+        <Button
+          variant="outlined"
+          component="label"
+          role={undefined}
+          startIcon={<AttachFileIcon />}
+          tabIndex={-1}
         >
-          <TextField
+          Select File
+          <Input
             required
-            id="title"
-            name="title"
-            label="Title"
-            defaultValue=""
-            placeholder="My File Box..."
+            type="file"
+            name="file"
+            inputProps={{ accept: ".csv" }}
+            sx={{
+              clip: "rect(0,0,0,0)",
+              clipPath: "inset(50%)",
+              height: 1,
+              overflow: "hidden",
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              whitespace: "nowrap",
+              width: 1
+            }}
           />
-          <TextField
-            required
-            id="description"
-            name="description"
-            label="Description"
-            defaultValue=""
-            placeholder="File box containing..."
-          />
+        </Button>
 
-          <Button
-            variant="outlined"
-            component="label"
-            role={undefined}
-            startIcon={<AttachFileIcon />}
-            tabIndex={-1}
-          >
-            Select File
-            <Input
-              required
-              type="file"
-              name="file"
-              inputProps={{ accept: ".csv" }}
-              sx={{
-                clip: "rect(0,0,0,0)",
-                clipPath: "inset(50%)",
-                height: 1,
-                overflow: "hidden",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                whitespace: "nowrap",
-                width: 1
-              }}
-            />
-          </Button>
-
-          <Submit />
-        </Stack>
+        <Submit />
       </Stack>
-    </Modal>
+    </>
   );
 };
 
