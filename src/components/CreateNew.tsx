@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Input from "@mui/material/Input";
 import Modal from "@mui/material/Modal";
 import Stack from "@mui/material/Stack";
@@ -45,7 +46,6 @@ export const CreateFormModal = ({
   isOpen,
   setIsOpen
 }: CreateFormModalProps): ReactElement => {
-  const { pending } = useFormStatus();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, formAction] = useFormState(createFileBox, {
     message: "",
@@ -122,21 +122,30 @@ export const CreateFormModal = ({
                 whitespace: "nowrap",
                 width: 1
               }}
-              disabled={pending}
             />
           </Button>
 
-          <Button
-            type="submit"
-            variant="contained"
-            role="submit"
-            startIcon={<CloudUploadIcon />}
-            disabled={pending}
-          >
-            Save File Box
-          </Button>
+          <Submit />
         </Stack>
       </Stack>
     </Modal>
+  );
+};
+
+const Submit = (): ReactElement => {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      type="submit"
+      variant="contained"
+      role="submit"
+      startIcon={
+        pending ? <CircularProgress size="1rem" /> : <CloudUploadIcon />
+      }
+      disabled={pending}
+    >
+      Save File Box
+    </Button>
   );
 };
