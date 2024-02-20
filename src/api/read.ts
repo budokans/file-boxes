@@ -16,6 +16,7 @@ export const getAllFileBoxes = async (): Promise<
 
     return fileboxRows.filter(fileBoxIsNotDeleted).map(
       (fileBox): FileBox => ({
+        id: fileBox._id,
         title: fileBox.title,
         description: fileBox.description,
         ...(fileBox.storage_file_name

@@ -37,14 +37,7 @@ const Home = async (): Promise<ReactElement> => {
             </Typography>
           ) : (
             fileBoxesOrError.map((fileBox, idx) => (
-              <FileBox
-                title={fileBox.title}
-                description={fileBox.description}
-                {...(fileBox.storageFilename
-                  ? { filename: fileBox.storageFilename }
-                  : {})}
-                key={idx}
-              />
+              <FileBox fileBox={fileBox} key={idx} />
             ))
           )}
         </Stack>

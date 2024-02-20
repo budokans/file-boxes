@@ -9,7 +9,13 @@ export const createFileBoxFormData = z.object({
 });
 export type CreateFileBoxFormData = z.infer<typeof createFileBoxFormData>;
 
+export const updateFileBoxFormData = createFileBoxFormData.merge(
+  z.object({ id: readonlyNonEmptyString })
+);
+export type UpdateFileBoxFormData = z.infer<typeof updateFileBoxFormData>;
+
 export interface FileBox {
+  readonly id: string;
   readonly title: string;
   readonly description: string;
   readonly storageFilename?: string;

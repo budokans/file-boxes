@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { randomUUID } from "crypto";
 import { fileBoxesCollection } from "@/db/mongoDb";
-import { CreateFileBoxFormData, createFileBoxFormData } from "@/api/schemas";
+import {
+  type UpdateFileBoxFormData,
+  updateFileBoxFormData
+} from "@/api/schemas";
 import {
   type FormActionState,
   parsedOrThrow,
@@ -11,33 +13,34 @@ import {
   uploadToS3
 } from "@/api/util";
 
-export const createFileBox = async (
+export const updateFileBox = async (
   _: FormActionState,
   formData: FormData
 ): Promise<FormActionState> => {
   try {
     const parsedData = parsedOrThrow(
       {
+        id: formData.get("id"),
         title: formData.get("title"),
         description: formData.get("description"),
-        file: formData.get("file")
+        ...(formData.get("file") ? { file: formData.get("file") } : {})
       },
-      createFileBoxFormData
+      updateFileBoxFormData
     );
 
     if (parsedData.file && parsedData.file.size > 0) {
       const filename = bucketFilename(parsedData.file.name);
       await uploadToS3(parsedData.file, filename);
-      await dbCreateFileBox(parsedData, filename);
+      await dbUpdateFileBox(parsedData, filename);
     } else {
-      await dbCreateFileBox(parsedData);
+      await dbUpdateFileBox(parsedData);
     }
 
     revalidatePath("/");
 
     return {
       success: true,
-      message: "Successfully uploaded to bucket."
+      message: `Successfully updated File Box ${parsedData.title}`
     };
   } catch (error) {
     console.error(error);
@@ -45,24 +48,26 @@ export const createFileBox = async (
     return {
       success: false,
       message:
-        error instanceof Error ? error.message : "Create new File Box failed."
+        error instanceof Error ? error.message : "Updating File Box failed."
     };
   }
 };
 
-const dbCreateFileBox = async (
-  createData: CreateFileBoxFormData,
-  bucketFilename?: string
+const dbUpdateFileBox = async (
+  updateData: UpdateFileBoxFormData,
+  filename?: string
 ): Promise<void> => {
   const collection = await fileBoxesCollection();
 
-  await collection.insertOne({
-    _id: randomUUID(),
-    title: createData.description,
-    description: createData.description,
-    storage_file_name: bucketFilename ?? null,
-    created_at: new Date().toISOString(),
-    updated_at: null,
-    deleted_at: null
-  });
+  await collection.updateOne(
+    { _id: updateData.id },
+    {
+      $set: {
+        title: updateData.title,
+        description: updateData.description,
+        updated_at: new Date().toISOString(),
+        ...(filename ? { storage_file_name: filename } : {})
+      }
+    }
+  );
 };

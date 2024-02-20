@@ -1,5 +1,3 @@
-"use client";
-
 import {
   useState,
   type ReactElement,
@@ -8,42 +6,51 @@ import {
   useEffect
 } from "react";
 import { useFormState } from "react-dom";
-import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { createFileBox } from "@/api/create";
+import EditIcon from "@mui/icons-material/Edit";
+import type { FileBox } from "@/api/schemas";
+import { updateFileBox } from "@/api/update";
 import { FormModal } from "@/components/FormModal";
 import { FileSelect } from "@/components/FileSelect";
 import { SubmitForm } from "@/components/SubmitForm";
+import Input from "@mui/material/Input";
 
-export const CreateNew = (): ReactElement => {
+interface EditExistingProps {
+  readonly fileBox: FileBox;
+}
+
+export const EditExisting = ({ fileBox }: EditExistingProps): ReactElement => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
     <>
-      <Button
-        variant="contained"
-        sx={{ marginLeft: "auto" }}
+      <IconButton
+        aria-label="Edit file box"
+        title="Edit File Box"
         onClick={() => setModalIsOpen(true)}
         disabled={modalIsOpen}
       >
-        Create new
-      </Button>
+        <EditIcon />
+      </IconButton>
 
       <FormModal isOpen={modalIsOpen} setIsOpen={setModalIsOpen}>
-        {modalIsOpen && <CreateNewForm setIsOpen={setModalIsOpen} />}
+        {modalIsOpen && (
+          <EditForm fileBox={fileBox} setIsOpen={setModalIsOpen} />
+        )}
       </FormModal>
     </>
   );
 };
 
-interface CreateNewFormProps {
+interface CreateNewFormProps extends EditExistingProps {
   readonly setIsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const CreateNewForm = ({ setIsOpen }: CreateNewFormProps): ReactElement => {
-  const [state, formAction] = useFormState(createFileBox, {
+const EditForm = ({ fileBox, setIsOpen }: CreateNewFormProps): ReactElement => {
+  const [state, formAction] = useFormState(updateFileBox, {
     message: "",
     success: false
   });
@@ -54,9 +61,10 @@ const CreateNewForm = ({ setIsOpen }: CreateNewFormProps): ReactElement => {
 
   return (
     <>
-      <Typography id="create-modal-title" variant="h6" component="h2">
-        Create a new File Box
+      <Typography id="edit-modal-title" variant="h6" component="h2">
+        Edit File Box
       </Typography>
+
       <Stack
         rowGap="1.5rem"
         component="form"
@@ -64,24 +72,29 @@ const CreateNewForm = ({ setIsOpen }: CreateNewFormProps): ReactElement => {
         autoComplete="off"
         action={formAction}
       >
+        <Input
+          name="id"
+          sx={{
+            display: "none"
+          }}
+          defaultValue={fileBox.id}
+        />
         <TextField
           required
           id="title"
           name="title"
           label="Title"
-          defaultValue=""
-          placeholder="My File Box..."
+          defaultValue={fileBox.title}
         />
         <TextField
           required
           id="description"
           name="description"
           label="Description"
-          defaultValue=""
-          placeholder="File box containing..."
+          defaultValue={fileBox.description}
         />
 
-        <FileSelect />
+        {!fileBox.storageFilename && <FileSelect />}
         <SubmitForm />
       </Stack>
     </>

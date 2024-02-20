@@ -4,23 +4,17 @@ import type { ReactElement } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import EditIcon from "@mui/icons-material/Edit";
+import type { FileBox as FileBoxSchema } from "@/api/schemas";
 import { DownloadFile } from "@/components/DownloadFile";
+import { EditExisting } from "@/components/EditExisting";
 
 interface FileBoxProps {
-  readonly title: string;
-  readonly description: string;
-  readonly filename?: string;
+  readonly fileBox: FileBoxSchema;
 }
 
-export const FileBox = ({
-  title,
-  description,
-  filename
-}: FileBoxProps): ReactElement => (
+export const FileBox = ({ fileBox }: FileBoxProps): ReactElement => (
   <>
     <Card
       sx={({ breakpoints }) => ({
@@ -31,23 +25,20 @@ export const FileBox = ({
       <CardHeader
         action={
           <>
-            <IconButton aria-label="Edit file box" title="Edit File Box">
-              <EditIcon />
-            </IconButton>
-
-            <DownloadFile filename={filename} />
+            <EditExisting fileBox={fileBox} />
+            <DownloadFile filename={fileBox.storageFilename} />
           </>
         }
         component="header"
-        title={title}
+        title={fileBox.title}
       />
 
       <CardContent>
         <Stack rowGap="1rem">
-          <Typography variant="body1">{description}</Typography>
+          <Typography variant="body1">{fileBox.description}</Typography>
 
           <Typography variant="body1" sx={{ wordWrap: "anywhere" }}>
-            {filename ?? "This box is empty."}
+            {fileBox.storageFilename ?? "This box is empty."}
           </Typography>
         </Stack>
       </CardContent>
