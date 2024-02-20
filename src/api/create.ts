@@ -58,7 +58,7 @@ const dbCreateFileBox = async (
 
   await collection.insertOne({
     _id: randomUUID(),
-    title: createData.description,
+    title: createData.title,
     description: createData.description,
     storage_file_name: bucketFilename ?? null,
     created_at: new Date().toISOString(),
