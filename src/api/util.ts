@@ -21,3 +21,13 @@ export const parsedOrThrow = <
 
   return parsed.data;
 };
+
+export const downloadFile = (file: File, filename: string): void => {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(file);
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
