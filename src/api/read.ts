@@ -5,6 +5,7 @@ import type { FileBox } from "@/api/schemas";
 import { fileBoxesCollection } from "@/db/mongoDb";
 import { s3 } from "@/db/s3";
 import { bucketNameOrThrow } from "@/db/util";
+import type { FileBoxRow } from "@/db/schemas";
 
 export const getAllFileBoxes = async (): Promise<
   readonly FileBox[] | Error
@@ -13,7 +14,7 @@ export const getAllFileBoxes = async (): Promise<
     const collection = await fileBoxesCollection();
     const fileboxRows = await collection.find().toArray();
 
-    return fileboxRows.map(
+    return fileboxRows.filter(fileBoxIsNotDeleted).map(
       (fileBox): FileBox => ({
         title: fileBox.title,
         description: fileBox.description,
@@ -27,6 +28,9 @@ export const getAllFileBoxes = async (): Promise<
     return new Error("Sorry, we were unable to get your file boxes.");
   }
 };
+
+const fileBoxIsNotDeleted = (fileBox: FileBoxRow) =>
+  fileBox.deleted_at === null;
 
 export const s3File = async (filename: string): Promise<string> => {
   const bucketName = bucketNameOrThrow();
