@@ -6,6 +6,7 @@ import {
   type Dispatch,
   type SetStateAction,
   type ReactNode,
+  type ChangeEvent,
   useEffect
 } from "react";
 import { useFormState, useFormStatus } from "react-dom";
@@ -118,35 +119,51 @@ const CreateNewForm = ({ setIsOpen }: CreateNewFormProps): ReactElement => {
           placeholder="File box containing..."
         />
 
-        <Button
-          variant="outlined"
-          component="label"
-          role={undefined}
-          startIcon={<AttachFileIcon />}
-          tabIndex={-1}
-        >
-          Select File
-          <Input
-            required
-            type="file"
-            name="file"
-            inputProps={{ accept: ".csv" }}
-            sx={{
-              clip: "rect(0,0,0,0)",
-              clipPath: "inset(50%)",
-              height: 1,
-              overflow: "hidden",
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              whitespace: "nowrap",
-              width: 1
-            }}
-          />
-        </Button>
-
+        <FileSelect />
         <Submit />
       </Stack>
+    </>
+  );
+};
+
+const FileSelect = (): ReactElement => {
+  const [selectedFilename, setSelectedFilename] = useState("");
+
+  return (
+    <>
+      <Button
+        variant="outlined"
+        component="label"
+        role={undefined}
+        startIcon={<AttachFileIcon />}
+        tabIndex={-1}
+        sx={{
+          overflow: "hidden"
+        }}
+      >
+        {selectedFilename ? selectedFilename : "Select File"}
+        <Input
+          required
+          type="file"
+          name="file"
+          inputProps={{ accept: ".csv" }}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            const file = event.target.files ? event.target.files[0] : null;
+            file && setSelectedFilename(file.name);
+          }}
+          sx={{
+            clip: "rect(0,0,0,0)",
+            clipPath: "inset(50%)",
+            height: 1,
+            overflow: "hidden",
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            whitespace: "nowrap",
+            width: 1
+          }}
+        />
+      </Button>
     </>
   );
 };
