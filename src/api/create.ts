@@ -1,15 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { randomUUID } from "crypto";
-import { fileBoxesCollection } from "@/db/mongoDb";
-import { CreateFileBoxFormData, createFileBoxFormData } from "@/api/schemas";
+import { createFileBoxFormData } from "@/api/schemas";
 import {
   type FormActionState,
   parsedOrThrow,
-  bucketFilename,
-  uploadToS3
+  bucketFilename
 } from "@/api/util";
+import { dbCreateFileBox } from "@/db/create";
+import { uploadToS3 } from "@/db/s3";
 
 export const createFileBox = async (
   _: FormActionState,
@@ -48,21 +47,4 @@ export const createFileBox = async (
         error instanceof Error ? error.message : "Create new File Box failed."
     };
   }
-};
-
-const dbCreateFileBox = async (
-  createData: CreateFileBoxFormData,
-  bucketFilename?: string
-): Promise<void> => {
-  const collection = await fileBoxesCollection();
-
-  await collection.insertOne({
-    _id: randomUUID(),
-    title: createData.title,
-    description: createData.description,
-    storage_file_name: bucketFilename ?? null,
-    created_at: new Date().toISOString(),
-    updated_at: null,
-    deleted_at: null
-  });
 };

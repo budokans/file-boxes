@@ -3,7 +3,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import IconButton from "@mui/material/IconButton";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
-import { s3File } from "@/api/read";
+import { s3File } from "@/db/s3";
 import { downloadFile } from "@/browser-io";
 
 interface DownloadFileProps {

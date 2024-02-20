@@ -1,3 +1,5 @@
+"use server";
+
 import { type Collection, type Db, MongoClient } from "mongodb";
 import type { FileBoxRow } from "@/db/schemas";
 

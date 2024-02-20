@@ -1,17 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { fileBoxesCollection } from "@/db/mongoDb";
-import {
-  type UpdateFileBoxFormData,
-  updateFileBoxFormData
-} from "@/api/schemas";
+import { updateFileBoxFormData } from "@/api/schemas";
 import {
   type FormActionState,
   parsedOrThrow,
-  bucketFilename,
-  uploadToS3
+  bucketFilename
 } from "@/api/util";
+import { dbUpdateFileBox } from "@/db/update";
+import { uploadToS3 } from "@/db/s3";
 
 export const updateFileBox = async (
   _: FormActionState,
@@ -51,23 +48,4 @@ export const updateFileBox = async (
         error instanceof Error ? error.message : "Updating File Box failed."
     };
   }
-};
-
-const dbUpdateFileBox = async (
-  updateData: UpdateFileBoxFormData,
-  filename?: string
-): Promise<void> => {
-  const collection = await fileBoxesCollection();
-
-  await collection.updateOne(
-    { _id: updateData.id },
-    {
-      $set: {
-        title: updateData.title,
-        description: updateData.description,
-        updated_at: new Date().toISOString(),
-        ...(filename ? { storage_file_name: filename } : {})
-      }
-    }
-  );
 };
