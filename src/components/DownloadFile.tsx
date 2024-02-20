@@ -4,7 +4,7 @@ import Alert from "@mui/material/Alert";
 import IconButton from "@mui/material/IconButton";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import { s3File } from "@/api/read";
-import { downloadFile } from "@/api/util";
+import { downloadFile } from "@/browser-io";
 
 interface DownloadFileProps {
   readonly filename: string | undefined;
