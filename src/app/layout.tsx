@@ -13,7 +13,7 @@ const RootLayout = ({
     <body>
       <AppRouterCacheProvider>
         <CssBaseline />
-        <Box maxWidth="1400px" padding={["1%", "2%", "3%"]}>
+        <Box maxWidth="1400px" padding={["1%", "2%", "3%"]} marginX="auto">
           <Stack rowGap="1.5rem">{children}</Stack>
         </Box>
       </AppRouterCacheProvider>
